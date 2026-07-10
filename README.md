@@ -3,7 +3,7 @@
 Enterprise-grade, reusable Java Selenium test automation framework built on
 the **Page Object Model** pattern. Designed so QA engineers can start writing
 automated tests immediately by importing existing page objects, utilities,
-configuration, and reporting â no framework plumbing required.
+configuration, and reporting — no framework plumbing required.
 
 ## Overview
 
@@ -13,33 +13,33 @@ data-driven testing, structured logging, HTML reporting with failure
 screenshots, retry logic for flaky tests, and CI/CD + Docker support out of
 the box.
 
-It is not a tutorial project â it follows SOLID, DRY, and Clean Architecture
+It is not a tutorial project — it follows SOLID, DRY, and Clean Architecture
 principles, and every component is meant to be extended, not replaced.
 
 ## Architecture
 
 ```
-                    âââââââââââââââââââ
-                    â   Test Classes   â  (src/test)
-                    ââââââââââ¬âââââââââ
-                             â uses
-                    ââââââââââ¼âââââââââ
-                    â   Page Objects   â  (BasePage, LoginPage, ...)
-                    ââââââââââ¬âââââââââ
-                             â uses
-        âââââââââââââââââââââ¼ââââââââââââââââââââââ
-        â                    â                     â
-âââââââââ¼ââââââââ   ââââââââââ¼âââââââââ   ââââââââââ¼âââââââââ
-â  WaitUtils     â   â  DriverManager   â   â  ConfigManager   â
-â  (explicit     â   â  (ThreadLocal    â   â  (properties +   â
-â   waits)       â   â   WebDriver)     â   â   env overlays)  â
-ââââââââââââââââââ   ââââââââââ¬âââââââââ   âââââââââââââââââââ
-                               â built by
-                      ââââââââââ¼âââââââââ
-                      â  DriverFactory   â  (local + remote Grid)
-                      ââââââââââââââââââ
+                    ┌─────────────────┐
+                    │   Test Classes   │  (src/test)
+                    └────────┬────────┘
+                             │ uses
+                    ┌────────▼────────┐
+                    │   Page Objects   │  (BasePage, LoginPage, ...)
+                    └────────┬────────┘
+                             │ uses
+        ┌───────────────────┼─────────────────────┐
+        │                    │                     │
+┌───────▼───────┐   ┌────────▼────────┐   ┌────────▼────────┐
+│  WaitUtils     │   │  DriverManager   │   │  ConfigManager   │
+│  (explicit     │   │  (ThreadLocal    │   │  (properties +   │
+│   waits)       │   │   WebDriver)     │   │   env overlays)  │
+└────────────────┘   └────────┬────────┘   └─────────────────┘
+                               │ built by
+                      ┌────────▼────────┐
+                      │  DriverFactory   │  (local + remote Grid)
+                      └────────────────┘
 
-TestListener (TestNG) âââ¶ ExtentManager (HTML report) + ScreenshotUtils + Log4j2
+TestListener (TestNG) ──▶ ExtentManager (HTML report) + ScreenshotUtils + Log4j2
 ```
 
 - **Page Object Model**: page objects encapsulate locators and page-specific actions; tests never touch `WebDriver` directly.
@@ -52,31 +52,31 @@ TestListener (TestNG) âââ¶ ExtentManager (HTML report) + Screensho
 
 ```
 claude_java_selenium_pom/
-âââ .github/workflows/ci.yml        # GitHub Actions CI pipeline
-âââ src/
-â   âââ main/java/com/claude/framework/
-â   â   âââ config/                 # ConfigManager
-â   â   âââ driver/                 # DriverFactory, DriverManager
-â   â   âââ enums/                  # BrowserType
-â   â   âââ exceptions/            # FrameworkException
-â   â   âââ listeners/              # TestListener, RetryAnalyzer
-â   â   âââ pages/                  # BasePage + sample page objects
-â   â   âââ reports/                # ExtentManager
-â   â   âââ utils/                  # WaitUtils, ScreenshotUtils, JsonDataReader
-â   âââ main/resources/            # config.properties + per-env overlays, log4j2.xml
-â   âââ test/
-â       âââ java/com/claude/tests/
-â       â   âââ base/               # BaseTest
-â       â   âââ tests/               # Sample test classes
-â¾       âââ resources/testdata/     # JSON test-data fixtures
-âââ testng.xml                      # Suite definition, parallel execution config
-âââ Dockerfile
-âââ docker-compose.yml              # Selenium Grid (hub + chrome/firefox nodes)
-âââ pom.xml
-âââ CONTRIBUTING.md
-âââ CODE_OF_CONDUCT.md
-âââ CHANGELOG.md
-âââ LICENSE
+├── .github/workflows/ci.yml        # GitHub Actions CI pipeline
+├── src/
+│   ├── main/java/com/claude/framework/
+│   │   ├── config/                 # ConfigManager
+│   │   ├── driver/                 # DriverFactory, DriverManager
+│   │   ├── enums/                  # BrowserType
+│   │   ├── exceptions/             # FrameworkException
+│   │   ├── listeners/              # TestListener, RetryAnalyzer
+│   │   ├── pages/                  # BasePage + sample page objects
+│   │   ├── reports/                # ExtentManager
+│   │   └── utils/                  # WaitUtils, ScreenshotUtils, JsonDataReader
+│   ├── main/resources/             # config.properties + per-env overlays, log4j2.xml
+│   └── test/
+│       ├── java/com/claude/tests/
+│       │   ├── base/               # BaseTest
+│       │   └── tests/               # Sample test classes
+│       └── resources/testdata/     # JSON test-data fixtures
+├── testng.xml                      # Suite definition, parallel execution config
+├── Dockerfile
+├── docker-compose.yml              # Selenium Grid (hub + chrome/firefox nodes)
+├── pom.xml
+├── CONTRIBUTING.md
+├── CODE_OF_CONDUCT.md
+├── CHANGELOG.md
+└── LICENSE
 ```
 
 ## Technology Stack
@@ -196,7 +196,7 @@ rolling daily log files under `target/logs/automation.log`.
 
 | Symptom                                  | Likely cause / fix                                                       |
 |--------------------------------------------|----------------------------------------------------------------------------|
-| `IllegalStateException: No WebDriver...`   | A test bypassed `BaseTest.setUp()` â extend `BaseTest`.                    |
+| `IllegalStateException: No WebDriver...`   | A test bypassed `BaseTest.setUp()` — extend `BaseTest`.                    |
 | Driver binary download fails                | Check network access; WebDriverManager needs outbound HTTPS.              |
 | Tests pass locally, fail in CI              | Confirm `-Dheadless=true` and that the app under test is reachable from CI.|
 | Flaky tests                                | Attach `RetryAnalyzer`, or check for a missing explicit wait in `WaitUtils`.|
