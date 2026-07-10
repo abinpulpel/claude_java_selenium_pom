@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      browser:
+        description: "Browser to run against"
+        required: false
+        default: "chrome"
+        type: choice
+        options: [ chrome, firefox, edge ]
+      env:
+        description: "Target environment"
+        required: false
+        default: "qa"
+        type: choice
+        options: [ qa, staging, prod ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [ chrome, firefox ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Run static analysis (SpotBugs)
+        run: mvn -B com.github.spotbugs:spotbugs-maven-plugin:check
+
+      - name: Run test suite (headless)
+        run: >
+          mvn -B clean test
+          -Dbrowser=${{ matrix.browser }}
+          -Denv=${{ github.event.inputs.env || 'qa' }}
+          -Dheadless=true
+
+      - name: Publish code coverage report
+        run: mvn -B jacoco:report
+
+      - name: Upload Surefire test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-results-${{ matrix.browser }}
+          path: target/surefire-reports/
+
+      - name: Upload Extent HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extent-report-${{ matrix.browser }}
+          path: target/reports/
+
+      - name: Upload failure screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-${{ matrix.browser }}
+          path: target/screenshots/
+          if-no-files-found: ignore
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-coverage-${{ matrix.browser }}
+          path: target/site/jacoco/
