@@ -1,0 +1,7 @@
+{
+  "cases": [
+    { "username": "standard_user", "password": "correct_password", "expectedSuccess": true },
+    { "username": "standard_user", "password": "wrong_password", "expectedSuccess": false },
+    { "username": "locked_out_user", "password": "correct_password", "expectedSuccess": false }
+  ]
+}
